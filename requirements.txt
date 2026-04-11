@@ -1,5 +1,3 @@
 flask
 gunicorn
-pymongo[srv]
-flask
 werkzeug
