@@ -1,0 +1,187 @@
+{
+    "usuarios": {
+        "val": {
+            "p": "90909090a",
+            "e": "vakecama32@gmail.com",
+            "bio": "¡Hola! Soy nuevo en Víctor-dit.",
+            "fecha_union": "11/04/2026 01:06:35",
+            "avatar": null,
+            "amigos": [
+                "victor"
+            ],
+            "solicitudes": [],
+            "visible_altura": false,
+            "visible_meta": false,
+            "visible_hw": false,
+            "altura": "",
+            "meta_fisica": "",
+            "hardware": "",
+            "estado": "Activo"
+        },
+        "victor": {
+            "p": "90909090a",
+            "e": "vakecama32@gmail.com",
+            "bio": "¡Hola! Soy nuevo en Víctor-dit.",
+            "fecha_union": "11/04/2026 01:07:09",
+            "avatar": null,
+            "amigos": [
+                "val",
+                "vicoco"
+            ],
+            "solicitudes": [],
+            "visible_altura": true,
+            "visible_meta": false,
+            "visible_hw": false,
+            "altura": "",
+            "meta_fisica": "",
+            "hardware": "",
+            "estado": "Activo"
+        },
+        "vicoco": {
+            "p": "90909090a",
+            "e": "vakecama32@gmail.com",
+            "bio": "¡Hola! Soy nuevo en Víctor-dit.",
+            "fecha_union": "11/04/2026 01:21:31",
+            "avatar": "avatar_vicoco_1775892070.jpeg",
+            "amigos": [
+                "victor",
+                "victoref"
+            ],
+            "solicitudes": [],
+            "altura": "",
+            "meta_fisica": "",
+            "hardware": "",
+            "estado": "Activo",
+            "visible_altura": true,
+            "visible_meta": true,
+            "visible_hw": true
+        },
+        "victoref": {
+            "p": "90909090a",
+            "e": "vakecama032@gmail.com",
+            "bio": "¡Hola! Soy nuevo en Víctor-dit.",
+            "fecha_union": "11/04/2026 01:39:54",
+            "avatar": null,
+            "amigos": [
+                "vicoco"
+            ],
+            "solicitudes": []
+        }
+    },
+    "foros": {
+        "General": [
+            {
+                "id": 1775888543,
+                "autor": "vicoco",
+                "contenido": "AMO KARLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                "archivo": null,
+                "tipo": null,
+                "comentarios": [],
+                "fecha": "01:22"
+            },
+            {
+                "id": 1775888113,
+                "autor": "val",
+                "contenido": "dx",
+                "archivo": "becmtyvjmc8pckhb4em7.mov",
+                "tipo": "vid",
+                "comentarios": [
+                    {
+                        "autor": "val",
+                        "texto": "ddsss",
+                        "fecha": "01:15"
+                    }
+                ],
+                "fecha": "01:15"
+            }
+        ]
+    },
+    "chats": {
+        "val_victor": [
+            {
+                "envia": "val",
+                "texto": "zd",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "01:10",
+                "leido": true
+            },
+            {
+                "envia": "val",
+                "texto": "",
+                "archivo": "Download_-_2026-04-10T204614.065.mp4",
+                "tipo": "vid",
+                "fecha": "01:13",
+                "leido": true
+            }
+        ],
+        "vicoco_victor": [
+            {
+                "envia": "victor",
+                "texto": "hola",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "01:34",
+                "leido": true
+            }
+        ],
+        "vicoco_victoref": [
+            {
+                "envia": "vicoco",
+                "texto": "HOLA MOONGOL",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "01:40",
+                "leido": true
+            },
+            {
+                "envia": "vicoco",
+                "texto": "",
+                "archivo": "Download_-_2026-04-10T204614.065.mp4",
+                "tipo": "vid",
+                "fecha": "01:41",
+                "leido": true
+            },
+            {
+                "envia": "victoref",
+                "texto": "JAJAJA mira",
+                "archivo": "Fantasia_y_Realidad.mp3",
+                "tipo": "file",
+                "fecha": "01:53",
+                "leido": true
+            },
+            {
+                "envia": "victoref",
+                "texto": "",
+                "archivo": "Download_-_2025-09-05T193345.672.mp4",
+                "tipo": "vid",
+                "fecha": "01:54",
+                "leido": true
+            },
+            {
+                "envia": "victoref",
+                "texto": "hola",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "02:04",
+                "leido": true
+            },
+            {
+                "envia": "vicoco",
+                "texto": "jola",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "02:07",
+                "leido": true
+            },
+            {
+                "envia": "vicoco",
+                "texto": "pene",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "02:08",
+                "leido": true
+            }
+        ]
+    }
+}
