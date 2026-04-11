@@ -4,13 +4,8 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-# AGREGADO: Soporte para Supabase (Persistencia real para que no se borre nada)
-try:
-    from supabase import create_client, Client
-except ImportError:
-    pass
 
-# AGREGADO: Forzar que el navegador reconozca videos correctamente
+# Forzar que el navegador reconozca videos correctamente
 mimetypes.add_type('video/mp4', '.mp4')
 mimetypes.add_type('video/webm', '.webm')
 mimetypes.add_type('video/quicktime', '.mov')
@@ -22,16 +17,12 @@ app.secret_key = 'victor_sullana_omega_2026'
 MI_CORREO = "vakecama32@gmail.com" 
 MI_PASSWORD = "kehn ludf ogeo mxmh" 
 
-# --- AGREGADO: Configuración de Supabase ---
-# Esto asegura que tus datos vivan en la nube y no en un JSON que se puede borrar.
-SUPABASE_URL = os.environ.get("SUPABASE_URL", "TU_URL_DE_SUPABASE")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "TU_KEY_DE_SUPABASE")
-
 UPLOADS = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOADS
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 
-# AGREGADO: Límite para textos muy largos en formularios
-app.config['MAX_FORM_MEMORY_SIZE'] = 10 * 1024 * 1024
+
+# SOLUCIÓN AL ERROR DE TEXTO: Aumentamos el límite de memoria para formularios
+app.config['MAX_FORM_MEMORY_SIZE'] = 15 * 1024 * 1024  # Permite hasta 15MB de texto
 
 if not os.path.exists(UPLOADS): os.makedirs(UPLOADS)
 
@@ -39,7 +30,6 @@ if not os.path.exists(UPLOADS): os.makedirs(UPLOADS)
 DB_PATH = 'datos_red_social.json'
 
 def cargar_datos():
-    # Intentamos cargar del JSON local primero (tu lógica original)
     if os.path.exists(DB_PATH):
         try:
             with open(DB_PATH, 'r', encoding='utf-8') as f:
@@ -58,7 +48,7 @@ def guardar_datos():
         "foros": foro_data,
         "chats": chats_privados
     }
-    # Guardamos con indent=2 para que el archivo no sea tan pesado (evita errores de texto)
+    # Reducimos el indent a 2 para que el archivo JSON sea menos pesado
     with open(DB_PATH, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
@@ -76,8 +66,8 @@ def enviar_codigo(correo_destino, codigo):
     msg['Subject'] = f"🤖 CÓDIGO ANTI-ROBOT: {codigo}"
     msg.attach(MIMEText(f"Tu código de acceso es: {codigo}", 'plain'))
     try:
-        # Cambio a puerto 465 (SSL) que suele ser más estable en servidores como Render/Railway
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15)
+        # Cambiado a SMTP_SSL en puerto 465 para mayor estabilidad
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=12)
         server.login(MI_CORREO, MI_PASSWORD)
         server.send_message(msg)
         server.quit()
@@ -194,26 +184,19 @@ def editar_perfil():
     if 'user' not in session: return redirect('/')
     usuario = session['user']
     
-    nueva_bio = request.form.get('bio', '').strip()
-    nueva_altura = request.form.get('altura', '').strip()
-    nueva_meta = request.form.get('meta_fisica', '').strip()
-    nuevo_hw = request.form.get('hardware', '').strip()
-    nuevo_estado = request.form.get('estado', 'Activo').strip()
-    
     usuarios_db[usuario]['visible_altura'] = (request.form.get('visible_altura') == 'on')
     usuarios_db[usuario]['visible_meta'] = (request.form.get('visible_meta') == 'on')
     usuarios_db[usuario]['visible_hw'] = (request.form.get('visible_hw') == 'on')
     
-    archivo = request.files.get('foto_perfil')
-    
-    if usuario not in usuarios_db: usuarios_db[usuario] = {}
-    
+    nueva_bio = request.form.get('bio', '').strip()
     if nueva_bio: usuarios_db[usuario]['bio'] = nueva_bio
-    usuarios_db[usuario]['altura'] = nueva_altura
-    usuarios_db[usuario]['meta_fisica'] = nueva_meta
-    usuarios_db[usuario]['hardware'] = nuevo_hw
-    usuarios_db[usuario]['estado'] = nuevo_estado
+    
+    usuarios_db[usuario]['altura'] = request.form.get('altura', '').strip()
+    usuarios_db[usuario]['meta_fisica'] = request.form.get('meta_fisica', '').strip()
+    usuarios_db[usuario]['hardware'] = request.form.get('hardware', '').strip()
+    usuarios_db[usuario]['estado'] = request.form.get('estado', 'Activo').strip()
 
+    archivo = request.files.get('foto_perfil')
     if archivo and archivo.filename != '':
         ext = os.path.splitext(archivo.filename)[1]
         filename = secure_filename(f"avatar_{usuario}_{int(time.time())}{ext}")
@@ -228,7 +211,6 @@ def enviar_solicitud(target):
     if 'user' not in session: return redirect('/')
     me = session['user']
     if target in usuarios_db and target != me:
-        if not isinstance(usuarios_db[target], dict): usuarios_db[target] = {}
         if "solicitudes" not in usuarios_db[target]: usuarios_db[target]["solicitudes"] = []
         if me not in usuarios_db[target]["solicitudes"]:
             usuarios_db[target]["solicitudes"].append(me)
@@ -363,12 +345,8 @@ def chat_privado(amigo):
 
         if msg or fname:
             chats_privados[sala].append({
-                "envia": me, 
-                "texto": msg, 
-                "archivo": fname, 
-                "tipo": ftype, 
-                "fecha": datetime.now().strftime("%H:%M"),
-                "leido": False 
+                "envia": me, "texto": msg, "archivo": fname, 
+                "tipo": ftype, "fecha": datetime.now().strftime("%H:%M"), "leido": False 
             })
             guardar_datos()
         return redirect(url_for('chat_privado', amigo=amigo))
@@ -379,16 +357,9 @@ def chat_privado(amigo):
 
 @app.route('/api/contador_global')
 def contador_global():
-    if 'user' not in session:
-        return jsonify({'total': 0})
-    
+    if 'user' not in session: return jsonify({'total': 0})
     me = session['user']
-    total = 0
-    for sala_id, mensajes in chats_privados.items():
-        if me in sala_id.split('_'):
-            for m in mensajes:
-                if m['envia'] != me and not m.get('leido', False):
-                    total += 1
+    total = sum(1 for s, ms in chats_privados.items() if me in s.split('_') for m in ms if m['envia'] != me and not m.get('leido', False))
     return jsonify({'total': total})
 
 @app.route('/api/mensajes/<amigo>')
@@ -396,13 +367,10 @@ def api_mensajes(amigo):
     if 'user' not in session: return ""
     me = session['user']
     sala = "_".join(sorted([me, amigo]))
-    
     mensajes = chats_privados.get(sala, [])
     for m in mensajes:
-        if m['envia'] == amigo:
-            m['leido'] = True
+        if m['envia'] == amigo: m['leido'] = True
     guardar_datos()
-    
     return render_template('solo_mensajes.html', mensajes=mensajes, mi_usuario=me, usuarios_db=usuarios_db)
 
 @app.route('/salir')
@@ -414,7 +382,7 @@ def salir():
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-# AGREGADO: Puerto dinámico para que funcione en Render/Railway
 if __name__ == '__main__':
+    # Puerto dinámico para servidores externos
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host='0.0.0.0', port=port)
