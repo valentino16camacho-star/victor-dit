@@ -1,3 +1,3 @@
 flask
 gunicorn
-supabase
+pymongo[srv]
