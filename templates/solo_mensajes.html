@@ -1,0 +1,26 @@
+{% for m in mensajes %}
+<div class="msg-container {% if m.envia == mi_usuario %}sent{% else %}received{% endif %}" data-id="{{ m.fecha }}">
+    {% set autor_info = usuarios_db.get(m.envia) %}
+    {% if autor_info and autor_info.avatar %}
+        <img src="{{ url_for('static', filename='uploads/' + autor_info.avatar) }}" class="avatar">
+    {% else %}
+        <div class="avatar" style="display:flex; align-items:center; justify-content:center; font-size:12px; color:white; background:#444;">{{ m.envia[0]|upper }}</div>
+    {% endif %}
+
+    <div class="bubble">
+        {% if m.texto %} <div>{{ m.texto }}</div> {% endif %}
+        
+        {% if m.archivo %}
+            {% if m.tipo == 'img' %}
+                <img src="{{ url_for('static', filename='uploads/' + m.archivo) }}" class="media-content">
+            {% elif m.tipo == 'vid' %}
+                <video src="{{ url_for('static', filename='uploads/' + m.archivo) }}" class="media-content" controls></video>
+            {% else %}
+                <a href="{{ url_for('static', filename='uploads/' + m.archivo) }}" class="file-link" target="_blank">📄 Archivo adjunto</a>
+            {% endif %}
+        {% endif %}
+        
+        <small style="display: block; font-size: 9px; opacity: 0.6; margin-top: 5px; text-align: right;">{{ m.fecha }}</small>
+    </div>
+</div>
+{% endfor %}

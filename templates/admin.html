@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Control | Víctor-dit</title>
+    <style>
+        body { background: #050505; color: #00ff88; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; }
+        .sidebar { width: 250px; background: #111; height: 100vh; padding: 20px; border-right: 2px solid #00ff88; position: fixed; }
+        .sidebar h2 { font-size: 1.2em; border-bottom: 1px solid #00ff88; padding-bottom: 10px; }
+        .cat-link { display: block; color: #00ff88; text-decoration: none; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .cat-link:hover { background: rgba(0, 255, 136, 0.1); }
+        .main { margin-left: 290px; padding: 40px; width: 100%; max-width: 800px; }
+        .flash-msg { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff4444; color: #ff4444; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        .post-box { background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333; margin-bottom: 30px; }
+        textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; resize: none; }
+        .card { background: #111; border: 1px solid #333; padding: 20px; border-radius: 10px; margin-bottom: 20px; position: relative; }
+        .card b { color: #00ff88; }
+        
+        /* Enlaces de usuario con efecto neón */
+        .user-link { color: #00ff88; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .user-link:hover { text-shadow: 0 0 8px #00ff88; }
+
+        .media-content { max-width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #222; }
+        .comentarios-section { margin-top: 15px; padding-top: 15px; border-top: 1px solid #222; }
+        .comentario { font-size: 0.9em; margin-bottom: 5px; background: #0a0a0a; padding: 5px 10px; border-radius: 4px; }
+        .btn-delete { color: #ff4444; text-decoration: none; font-size: 0.8em; position: absolute; top: 20px; right: 20px; }
+        .btn-main { background: #00ff88; color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; transition: 0.3s; }
+        .btn-main:hover { box-shadow: 0 0 15px #00ff88; }
+        .btn-main:disabled { background: #444; cursor: not-allowed; box-shadow: none; }
+
+        /* Botón de búsqueda especial */
+        .search-btn { background: #000; border: 1px solid #00ff88; color: #00ff88; padding: 10px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: block; text-align: center; text-decoration: none; }
+        .search-btn:hover { background: #00ff88; color: #000; }
+
+        /* Badge de Notificaciones */
+        .notif-badge {
+            display: none;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff4444;
+            border: 1px solid white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>VÍCTOR-DIT</h2>
+        <p>Usuario: <a href="/perfil/{{ mi_usuario }}" class="user-link">{{ mi_usuario }}</a></p>
+        
+        <a href="/buscar" class="search-btn">🔍 BUSCAR USUARIOS</a>
+        
+        <a href="/mis_chats" class="search-btn" style="border-color: #00ccff; color: #00ccff; position: relative;">
+            💬 MIS MENSAJES
+            <span id="notif-badge" class="notif-badge">0</span>
+        </a>
+
+        <a href="/perfil/{{ mi_usuario }}" class="cat-link">👤 MI PERFIL</a>
+
+        <hr border="1" color="#222">
+        <h3>Foros</h3>
+        {% for c in categorias %}
+            <a href="/foro/{{ c }}" class="cat-link"># {{ c }}</a>
+        {% endfor %}
+        
+        <form action="/crear_categoria" method="post" style="margin-top: 20px;">
+            <input type="text" name="nombre_cat" placeholder="Nuevo foro..." style="width: 70%; background: #000; border: 1px solid #333; color: #fff; padding: 5px;">
+            <button type="submit" style="background: #00ff88; border: none; cursor: pointer; padding: 5px 10px;">+</button>
+        </form>
+
+        <br><br>
+        <a href="/salir" style="color: #ff4444; text-decoration: none; font-weight: bold;">[!] Cerrar Sesión</a>
+    </div>
+
+    <div class="main">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="flash-msg">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <h1>Foro: {{ cat }}</h1>
+
+        <div class="post-box">
+            <form id="form-publicar" action="/publicar/{{ cat }}" method="post" enctype="multipart/form-data">
+                <textarea name="mensaje" rows="3" placeholder="¿Qué estás pensando, {{ mi_usuario }}?" required></textarea>
+                <div style="margin-top: 10px;">
+                    <input type="file" name="archivo" accept="image/*,video/*" id="input-file">
+                    <button type="submit" class="btn-main" id="btn-submit">PUBLICAR HILO</button>
+                </div>
+            </form>
+        </div>
+
+        {% for post in posts %}
+        <div class="card">
+            {% if post.autor == mi_usuario %}
+                <a href="/eliminar/{{ cat }}/{{ post.id }}" class="btn-delete confirm-delete">ELIMINAR</a>
+            {% endif %}
+
+            <a href="/perfil/{{ post.autor }}" class="user-link">@{{ post.autor }}</a> 
+            <small style="color: #555;">• {{ post.fecha }}</small>
+            
+            <p>{{ post.contenido }}</p>
+
+            {% if post.archivo %}
+                {% if post.tipo == 'img' %}
+                    <img src="{{ url_for('static', filename='uploads/' + post.archivo) }}" class="media-content">
+                {% elif post.tipo == 'vid' %}
+                    <video controls class="media-content" preload="metadata">
+                        <source src="{{ url_for('static', filename='uploads/' + post.archivo) }}" type="video/mp4">
+                        Tu navegador no soporta la reproducción de videos.
+                    </video>
+                {% endif %}
+            {% endif %}
+
+            <div class="comentarios-section">
+                {% for com in post.comentarios %}
+                    <div class="comentario">
+                        <a href="/perfil/{{ com.autor }}" class="user-link" style="font-size: 0.9em;">{{ com.autor }}:</a> {{ com.texto }}
+                    </div>
+                {% endfor %}
+                
+                <form action="/comentar/{{ cat }}/{{ post.id }}" method="post" style="margin-top: 10px; display: flex;">
+                    <input type="text" name="comentario" placeholder="Escribe un comentario..." required 
+                           style="flex-grow: 1; background: #000; border: 1px solid #333; color: #fff; padding: 5px;">
+                    <button type="submit" style="background: #00ff88; border: none; padding: 5px 10px; cursor: pointer;">OK</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // 1. Confirmación de borrado
+        document.querySelectorAll('.confirm-delete').forEach(boton => {
+            boton.addEventListener('click', function(e) {
+                if (!confirm('¿Seguro que quieres borrar este hilo? Se perderá para siempre.')) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // 2. Efecto de carga al publicar
+        const form = document.getElementById('form-publicar');
+        const btn = document.getElementById('btn-submit');
+
+        if(form) {
+            form.addEventListener('submit', function() {
+                btn.innerHTML = "SUBIENDO... 🚀";
+                btn.disabled = true;
+            });
+        }
+
+        // 3. Sistema de Notificaciones en Tiempo Real
+        function actualizarNotificaciones() {
+            fetch('/api/contador_global')
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById('notif-badge');
+                if (data.total > 0) {
+                    badge.innerText = data.total;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(err => console.log("Error al obtener notificaciones"));
+        }
+
+        // Ejecutar cada 5 segundos
+        setInterval(actualizarNotificaciones, 5000);
+        actualizarNotificaciones(); // Carga inicial
+    </script>
+
+</body>
+</html>

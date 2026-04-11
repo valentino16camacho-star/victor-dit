@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Privado | Víctor-dit</title>
+    <style>
+        :root {
+            --fondo-oscuro: #0d1117;
+            --panel-secundario: #161b22;
+            --verde-neon: #00ff88;
+            --texto-principal: #c9d1d9;
+            --burbuja-enviado: #00ff88;
+            --burbuja-recibido: #21262d;
+            --rojo-notif: #ff4444;
+        }
+
+        body {
+            background-color: var(--fondo-oscuro) !important;
+            color: var(--texto-principal);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        .main-chat {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, #161b22, #0d1117);
+        }
+
+        .chat-header {
+            padding: 15px 30px;
+            background: var(--panel-secundario);
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #0b0e14;
+            scroll-behavior: smooth;
+        }
+
+        .msg-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            max-width: 80%;
+        }
+
+        .msg-container.sent {
+            flex-direction: row-reverse;
+            align-self: flex-end;
+        }
+
+        .msg-container.received {
+            align-self: flex-start;
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #30363d;
+            object-fit: cover;
+            border: 2px solid var(--panel-secundario);
+        }
+
+        .bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .sent .bubble {
+            background: var(--burbuja-enviado);
+            color: #000;
+            border-bottom-right-radius: 2px;
+        }
+
+        .received .bubble {
+            background: var(--burbuja-recibido);
+            color: #fff;
+            border: 1px solid #30363d;
+            border-bottom-left-radius: 2px;
+        }
+
+        .media-content {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .file-link {
+            display: block;
+            margin-top: 8px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .input-area {
+            padding: 20px;
+            background: var(--panel-secundario);
+            border-top: 1px solid #30363d;
+        }
+
+        .input-box {
+            background: var(--fondo-oscuro);
+            border: 1px solid #30363d;
+            border-radius: 50px;
+            display: flex;
+            padding: 5px 15px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-box input[type="text"] {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 12px;
+            outline: none;
+        }
+
+        .btn-send {
+            background: var(--verde-neon);
+            border: none;
+            color: black;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .clip-btn {
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--verde-neon);
+            transition: 0.2s;
+        }
+
+        .clip-btn:hover { transform: scale(1.2); }
+
+        /* Badge para el botón volver si hay otros mensajes */
+        .notif-badge {
+            display: none;
+            background: var(--rojo-notif);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 50%;
+            margin-left: 5px;
+            box-shadow: 0 0 8px var(--rojo-notif);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-chat">
+        <div class="chat-header">
+            <a href="/mis_chats" style="color: var(--verde-neon); text-decoration: none; font-weight: bold; display: flex; align-items: center;">
+                ⬅ Volver <span id="notif-badge" class="notif-badge">0</span>
+            </a>
+            <h3 style="margin: 0;">{{ amigo }}</h3>
+            <div style="width: 10px; height: 10px; background: var(--verde-neon); border-radius: 50%; box-shadow: 0 0 10px var(--verde-neon);"></div>
+        </div>
+
+        <div class="chat-messages" id="box">
+            {% for m in mensajes %}
+            <div class="msg-container {% if m.envia == mi_usuario %}sent{% else %}received{% endif %}" data-id="{{ m.fecha }}">
+                {% set autor_info = usuarios_db.get(m.envia) %}
+                {% if autor_info and autor_info.avatar %}
+                    <img src="{{ url_for('static', filename='uploads/' + autor_info.avatar) }}" class="avatar">
+                {% else %}
+                    <div class="avatar" style="display:flex; align-items:center; justify-content:center; font-size:12px; color:white; background:#444;">{{ m.envia[0]|upper }}</div>
+                {% endif %}
+
+                <div class="bubble">
+                    {% if m.texto %} <div>{{ m.texto }}</div> {% endif %}
+                    
+                    {% if m.archivo %}
+                        {% if m.tipo == 'img' %}
+                            <img src="{{ url_for('static', filename='uploads/' + m.archivo) }}" class="media-content">
+                        {% elif m.tipo == 'vid' %}
+                            <video class="media-content chat-video" controls preload="metadata">
+                                <source src="{{ url_for('static', filename='uploads/' + m.archivo) }}" type="video/mp4">
+                            </video>
+                        {% else %}
+                            <a href="{{ url_for('static', filename='uploads/' + m.archivo) }}" class="file-link" target="_blank">📄 Archivo adjunto</a>
+                        {% endif %}
+                    {% endif %}
+                    
+                    <small style="display: block; font-size: 9px; opacity: 0.6; margin-top: 5px; text-align: right;">{{ m.fecha }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <form class="input-area" method="POST" enctype="multipart/form-data" id="chat-form">
+            <div class="input-box">
+                <label class="clip-btn" title="Adjuntar foto, video o archivo">
+                    📎
+                    <input type="file" name="archivo" style="display: none;">
+                </label>
+                <input type="text" name="mensaje" id="msg-input" placeholder="Escribe un mensaje..." autocomplete="off">
+                <button type="submit" class="btn-send">ENVIAR</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const box = document.getElementById("box");
+
+        function scrollToBottom() {
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // Ejecutar al cargar
+        scrollToBottom();
+
+        function actualizarMensajes() {
+            // REVISAR SI HAY VIDEO EN PLAY PARA NO INTERRUMPIR
+            const videos = document.querySelectorAll('.chat-video');
+            let videoEnReproduccion = false;
+            videos.forEach(v => {
+                if (!v.paused && !v.ended && v.readyState > 2) videoEnReproduccion = true;
+            });
+
+            if (videoEnReproduccion) return;
+
+            fetch('/api/mensajes/{{ amigo }}')
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const nuevosMensajes = doc.querySelectorAll('.msg-container');
+                const mensajesActuales = box.querySelectorAll('.msg-container');
+
+                if (nuevosMensajes.length > mensajesActuales.length) {
+                    for (let i = mensajesActuales.length; i < nuevosMensajes.length; i++) {
+                        box.appendChild(nuevosMensajes[i]);
+                    }
+                    scrollToBottom();
+                }
+            })
+            .catch(err => console.error('Error al actualizar mensajes:', err));
+        }
+
+        // NUEVO: Función para ver si hay mensajes de OTROS amigos mientras estoy en este chat
+        function actualizarNotificacionesGlobales() {
+            fetch('/api/contador_global')
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById('notif-badge');
+                if (data.total > 0) {
+                    badge.innerText = data.total;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(err => console.log("Error en notificaciones"));
+        }
+
+        // Intervalos
+        setInterval(actualizarMensajes, 2000);
+        setInterval(actualizarNotificacionesGlobales, 4000);
+        
+        // Carga inicial de notificaciones
+        actualizarNotificacionesGlobales();
+    </script>
+</body>
+</html>

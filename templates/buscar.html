@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscar Usuarios | Víctor-dit</title>
+    <style>
+        body { background: #050505; color: #00ff88; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; }
+        .sidebar { width: 250px; background: #111; height: 100vh; padding: 20px; border-right: 2px solid #00ff88; position: fixed; }
+        .main { margin-left: 290px; padding: 40px; width: 100%; max-width: 800px; }
+        .user-card { background: #111; border: 1px solid #333; padding: 15px; border-radius: 10px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .avatar-mini { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #00ff88; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        input[type="text"] { width: 100%; background: #000; border: 1px solid #00ff88; color: #fff; padding: 12px; border-radius: 8px; font-size: 1em; box-shadow: 0 0 10px rgba(0,255,136,0.1); }
+        .btn-add { background: #00ff88; color: #000; text-decoration: none; padding: 5px 12px; border-radius: 5px; font-weight: bold; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>VÍCTOR-DIT</h2>
+        <a href="/foro/General" style="color: #00ff88; text-decoration: none;">🏠 Inicio</a>
+    </div>
+    <div class="main">
+        <h1>🔍 Buscador de Sullana</h1>
+        <form action="/buscar" method="post">
+            <input type="text" name="query" placeholder="¿A quién buscas?" value="{{ query }}" autofocus>
+        </form>
+        <br>
+        {% for r in resultados %}
+            <div class="user-card">
+                <div class="avatar-mini">
+                    {% if r.avatar %}
+                        <img src="{{ url_for('static', filename='uploads/' + r.avatar) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        {{ r.nombre[0].upper() }}
+                    {% endif %}
+                </div>
+                <a href="/perfil/{{ r.nombre }}" style="color: #fff; text-decoration: none; flex-grow: 1;">@{{ r.nombre }}</a>
+                <a href="/enviar_solicitud/{{ r.nombre }}" class="btn-add">+ AGREGAR</a>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

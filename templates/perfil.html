@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil de {{ perfil_user }} | Víctor-dit</title>
+    <style>
+        body { background: #050505; color: #00ff88; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; }
+        .sidebar { width: 250px; background: #111; height: 100vh; padding: 20px; border-right: 2px solid #00ff88; position: fixed; }
+        .sidebar h2 { font-size: 1.2em; border-bottom: 1px solid #00ff88; padding-bottom: 10px; }
+        .cat-link { display: block; color: #00ff88; text-decoration: none; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .cat-link:hover { background: rgba(0, 255, 136, 0.1); }
+        
+        .main { margin-left: 290px; padding: 40px; width: 100%; max-width: 800px; }
+        
+        /* Mensajes Flash */
+        .flash-msg { background: rgba(0, 255, 136, 0.1); border: 1px solid #00ff88; color: #00ff88; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+
+        /* Cabecera de Perfil Pro */
+        .profile-card { 
+            background: #111; 
+            padding: 30px; 
+            border-radius: 15px; 
+            border: 1px solid #00ff88; 
+            text-align: center; 
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+        }
+        .avatar-circle { 
+            width: 120px; height: 120px; 
+            background: #000; border: 2px solid #00ff88; 
+            border-radius: 50%; margin: 0 auto 15px; 
+            display: flex; align-items: center; justify-content: center; 
+            overflow: hidden; 
+        }
+        .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-circle span { font-size: 2.5em; font-weight: bold; color: #00ff88; text-shadow: 0 0 10px #00ff88; }
+
+        .bio-box { color: #aaa; margin: 15px 0; line-height: 1.6; font-style: italic; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #222; }
+        .stats-bar { color: #555; font-size: 0.8em; margin-top: 10px; }
+
+        /* Dashboard Looksmaxxing */
+        .tech-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; text-align: left; }
+        .tech-stat { background: #000; padding: 10px; border: 1px solid #222; border-radius: 5px; }
+        .tech-label { color: #00ff88; display: block; font-size: 0.65em; text-transform: uppercase; letter-spacing: 1px; }
+        .tech-val { font-family: 'Courier New', monospace; font-size: 0.9em; color: #fff; }
+
+        /* Botones */
+        .btn-update { background: #00ff88; color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 5px; transition: 0.3s; margin-top: 10px; display: inline-block; text-decoration: none; }
+        .btn-update:hover { box-shadow: 0 0 15px #00ff88; transform: scale(1.05); }
+        
+        .btn-friend { background: #000; color: #00ff88; border: 1px solid #00ff88; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block; transition: 0.3s; }
+        .btn-friend:hover { background: #00ff88; color: #000; }
+        .btn-danger { border-color: #ff4444 !important; color: #ff4444 !important; }
+        .btn-danger:hover { background: #ff4444 !important; color: #fff !important; }
+        
+        .btn-chat { background: rgba(0, 255, 136, 0.1); border: 1px solid #00ff88; color: #00ff88; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block; transition: 0.3s; }
+        .btn-chat:hover { background: #00ff88; color: #000; box-shadow: 0 0 10px #00ff88; }
+
+        /* Estilo para los Checkboxes de privacidad */
+        .privacy-check { color: #444; font-size: 0.7em; display: flex; align-items: center; gap: 5px; margin-top: 5px; margin-bottom: 10px; cursor: pointer; }
+        .privacy-check input { width: auto !important; margin: 0; }
+
+        /* Amigos Grid */
+        .friends-list { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px; }
+        .friend-tag { background: #000; border: 1px solid #333; padding: 5px 12px; border-radius: 20px; color: #888; text-decoration: none; font-size: 0.85em; transition: 0.3s; }
+        .friend-tag:hover { border-color: #00ff88; color: #00ff88; }
+
+        /* Formulario */
+        .edit-section { background: #0a0a0a; padding: 20px; border-radius: 10px; border: 1px dashed #333; margin-top: 20px; text-align: left; }
+        input[type="text"], textarea { background: #000; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 5px; width: 95%; margin-bottom: 10px; font-family: inherit; }
+
+        /* Muro */
+        .card { background: #111; border: 1px solid #333; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .tag-foro { background: rgba(0, 255, 136, 0.1); color: #00ff88; padding: 2px 8px; border-radius: 10px; font-size: 0.7em; }
+        .media-content { max-width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #222; }
+        
+        .req-card { background: #000; border: 1px solid #00ff88; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>VÍCTOR-DIT</h2>
+        <a href="/foro/General" class="cat-link">🏠 Volver al Inicio</a>
+        <a href="/buscar" class="cat-link">🔍 Buscar Amigos</a>
+        <hr border="1" color="#222">
+        <h3>Foros</h3>
+        {% for c in categorias %}
+            <a href="/foro/{{ c }}" class="cat-link"># {{ c }}</a>
+        {% endfor %}
+        <br>
+        <a href="/salir" style="color: #ff4444; text-decoration: none; font-weight: bold;">[!] Cerrar Sesión</a>
+    </div>
+
+    <div class="main">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="flash-msg">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="profile-card">
+            <div class="avatar-circle">
+                {% if info.avatar %}
+                    <img src="{{ url_for('static', filename='uploads/' + info.avatar) }}">
+                {% else %}
+                    <span>{{ perfil_user[0].upper() }}</span>
+                {% endif %}
+            </div>
+
+            <h1 style="margin: 0;">@{{ perfil_user }}</h1>
+            <div class="stats-bar">STATUS: {{ info.get('estado', 'ACTIVO') }} | Miembro desde: {{ info.get('fecha_union', '2026') }}</div>
+            
+            <div class="tech-dashboard">
+                {% if info.get('visible_meta', True) or perfil_user == mi_usuario %}
+                <div class="tech-stat">
+                    <span class="tech-label">Esthetic Goal {% if not info.get('visible_meta', True) %}(Oculto){% endif %}</span>
+                    <span class="tech-val">{{ info.get('meta_fisica', 'NOT_SET') }}</span>
+                </div>
+                {% endif %}
+
+                {% if info.get('visible_hw', True) or perfil_user == mi_usuario %}
+                <div class="tech-stat">
+                    <span class="tech-label">Hardware Arch {% if not info.get('visible_hw', True) %}(Oculto){% endif %}</span>
+                    <span class="tech-val">{{ info.get('hardware', 'GENERIC_PC') }}</span>
+                </div>
+                {% endif %}
+
+                {% if info.get('visible_altura', True) or perfil_user == mi_usuario %}
+                <div class="tech-stat">
+                    <span class="tech-label">Current Height {% if not info.get('visible_altura', True) %}(Oculto){% endif %}</span>
+                    <span class="tech-val">{{ info.get('altura', '--') }} cm</span>
+                </div>
+                {% endif %}
+
+                <div class="tech-stat">
+                    <span class="tech-label">Hilos Publicados</span>
+                    <span class="tech-val">{{ posts|length }}</span>
+                </div>
+            </div>
+
+            <p class="bio-box">
+                "{{ info.get('bio', 'Este usuario aún no tiene biografía.') }}"
+            </p>
+
+            {% if perfil_user != mi_usuario %}
+                <div style="margin: 20px 0;">
+                    {% if mi_usuario in info.amigos %}
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <a href="/chat/{{ perfil_user }}" class="btn-chat">💬 CHATEAR</a>
+                            <span class="btn-friend" style="border-color: #555; color: #555; cursor: default;">🤝 AMIGOS</span>
+                            <a href="/eliminar_amigo/{{ perfil_user }}" class="btn-friend btn-danger" onclick="return confirm('¿Seguro que quieres eliminar a este amigo?')">ELIMINAR</a>
+                        </div>
+                    {% elif mi_usuario in info.solicitudes %}
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <span class="btn-friend" style="opacity: 0.6; cursor: default;">⏳ PENDIENTE</span>
+                        </div>
+                    {% else %}
+                        <a href="/enviar_solicitud/{{ perfil_user }}" class="btn-friend">➕ AGREGAR AMIGO</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <div style="margin-top: 20px; border-top: 1px solid #222; padding-top: 15px;">
+                <h4 style="color: #00ff88; margin-bottom: 10px; font-size: 0.9em;">AMIGOS ({{ info.amigos|length if info.amigos else 0 }})</h4>
+                <div class="friends-list">
+                    {% if info.amigos %}
+                        {% for amigo in info.amigos %}
+                            <a href="/perfil/{{ amigo }}" class="friend-tag">@{{ amigo }}</a>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: #444; font-size: 0.8em;">Aún no tiene amigos.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if perfil_user == mi_usuario %}
+            <div class="edit-section">
+                <h4 style="margin: 0 0 15px 0; color: #00ff88; border-bottom: 1px solid #222; padding-bottom: 5px;">Configurar Perfil_Pro</h4>
+                <form action="/editar_perfil" method="post" enctype="multipart/form-data">
+                    <label style="font-size: 0.75em; color: #555;">Biografía Técnica:</label><br>
+                    <textarea name="bio" placeholder="Nueva biografía..." maxlength="150" rows="2">{{ info.bio }}</textarea><br>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.75em; color: #555;">Meta (Looksmaxxing):</label>
+                            <input type="text" name="meta_fisica" placeholder="Ej: 1.85m goal" value="{{ info.meta_fisica }}">
+                            <label class="privacy-check">
+                                <input type="checkbox" name="visible_meta" {% if info.get('visible_meta', True) %}checked{% endif %}> Mostrar al público
+                            </label>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 0.75em; color: #555;">Altura actual (cm):</label>
+                            <input type="text" name="altura" placeholder="Ej: 175" value="{{ info.altura }}">
+                            <label class="privacy-check">
+                                <input type="checkbox" name="visible_altura" {% if info.get('visible_altura', True) %}checked{% endif %}> Mostrar al público
+                            </label>
+                        </div>
+                    </div>
+
+                    <label style="font-size: 0.75em; color: #555;">Hardware (Specs):</label><br>
+                    <input type="text" name="hardware" placeholder="Ej: i5 12th Gen / RTX 3050" value="{{ info.hardware }}" style="width: 95%;">
+                    <label class="privacy-check">
+                        <input type="checkbox" name="visible_hw" {% if info.get('visible_hw', True) %}checked{% endif %}> Mostrar al público
+                    </label>
+
+                    <label style="font-size: 0.8em; color: #555;">Actualizar Avatar:</label><br>
+                    <input type="file" name="foto_perfil" accept="image/*" style="font-size: 0.8em; color: #888; margin: 10px 0;"><br>
+                    
+                    <button type="submit" class="btn-update">APLICAR PARAMETROS</button>
+                </form>
+            </div>
+
+                {% if info.solicitudes %}
+                <div style="margin-top: 30px; text-align: left;">
+                    <h3 style="color: #00ff88; font-size: 1em; border-bottom: 1px solid #222;">📩 Solicitudes Pendientes</h3>
+                    {% for remitente in info.solicitudes %}
+                    <div class="req-card">
+                        <span><b>@{{ remitente }}</b> te envió una solicitud</span>
+                        <a href="/aceptar_solicitud/{{ remitente }}" class="btn-update" style="padding: 5px 15px; margin: 0; font-size: 0.8em;">ACEPTAR</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <h3 style="border-bottom: 1px solid #333; padding-bottom: 10px;">ACTIVITY_LOG de {{ perfil_user }}</h3>
+
+        {% if not posts %}
+            <p style="color: #555; text-align: center;">Sin publicaciones por ahora.</p>
+        {% endif %}
+
+        {% for post in posts %}
+        <div class="card">
+            <span class="tag-foro">En #{{ post.cat_origen }}</span>
+            <p>{{ post.contenido }}</p>
+
+            {% if post.archivo %}
+                {% if post.tipo == 'img' %}
+                    <img src="{{ url_for('static', filename='uploads/' + post.archivo) }}" class="media-content">
+                {% elif post.tipo == 'vid' %}
+                    <video controls class="media-content">
+                        <source src="{{ url_for('static', filename='uploads/' + post.archivo) }}">
+                    </video>
+                {% endif %}
+            {% endif %}
+            
+            <div style="color: #444; font-size: 0.7em; margin-top: 10px;">{{ post.fecha }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

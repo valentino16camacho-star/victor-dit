@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verificar | Víctor-dit</title>
+    <style>
+        body { background:#050505; color:#00ff88; font-family:sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+        .box { border:2px solid #00ff88; padding:30px; border-radius:15px; background:#111; width:350px; text-align:center; }
+        input { width:100%; padding:15px; font-size:24px; text-align:center; background:#000; border:1px solid #333; color:#00ff88; margin:20px 0; border-radius:8px; }
+        button { width:100%; padding:12px; background:#00ff88; color:black; border:none; font-weight:bold; cursor:pointer; border-radius:5px; }
+        .error-msg { background: rgba(255, 0, 0, 0.2); border: 1px solid #ff4444; color: #ff4444; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>🛡️ VERIFICACIÓN</h2>
+        <p style="color:#888;">Ingresa el código enviado al correo de: <br><b>{{ usuario }}</b></p>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="error-msg">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="/verificar/{{ usuario }}" method="post">
+            <input type="text" name="c" placeholder="000000" maxlength="6" required autocomplete="off">
+            <button type="submit">ACTIVAR CUENTA</button>
+        </form>
+    </div>
+</body>
+</html>

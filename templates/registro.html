@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro | Víctor-dit</title>
+    <style>
+        body { background:#050505; color:#00ff88; font-family:sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+        .box { border:2px solid #00ff88; padding:30px; border-radius:15px; background:#111; width:320px; }
+        input { width:100%; padding:10px; margin:10px 0; background:#000; border:1px solid #333; color:#00ff88; box-sizing:border-box; }
+        button { width:100%; padding:10px; background:#00ff88; color:black; border:none; font-weight:bold; cursor:pointer; }
+        .error-msg { background: rgba(255, 0, 0, 0.2); border: 1px solid #ff4444; color: #ff4444; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2 style="text-align:center;">REGISTRO</h2>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="error-msg">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="/registro" method="post">
+            <input type="text" name="u" placeholder="Usuario" required>
+            <input type="email" name="e" placeholder="Correo Electrónico" required>
+            <input type="password" name="p" placeholder="Contraseña" required>
+            <button type="submit">CREAR CUENTA</button>
+        </form>
+    </div>
+</body>
+</html>
