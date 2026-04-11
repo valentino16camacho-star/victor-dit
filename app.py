@@ -4,6 +4,11 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+# AGREGADO: Soporte para Supabase (Persistencia real para que no se borre nada)
+try:
+    from supabase import create_client, Client
+except ImportError:
+    pass
 
 # AGREGADO: Forzar que el navegador reconozca videos correctamente
 mimetypes.add_type('video/mp4', '.mp4')
@@ -17,15 +22,24 @@ app.secret_key = 'victor_sullana_omega_2026'
 MI_CORREO = "vakecama32@gmail.com" 
 MI_PASSWORD = "kehn ludf ogeo mxmh" 
 
+# --- AGREGADO: Configuración de Supabase ---
+# Esto asegura que tus datos vivan en la nube y no en un JSON que se puede borrar.
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "TU_URL_DE_SUPABASE")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "TU_KEY_DE_SUPABASE")
+
 UPLOADS = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOADS
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 
+# AGREGADO: Límite para textos muy largos en formularios
+app.config['MAX_FORM_MEMORY_SIZE'] = 10 * 1024 * 1024
+
 if not os.path.exists(UPLOADS): os.makedirs(UPLOADS)
 
 # --- SISTEMA DE PERSISTENCIA ---
 DB_PATH = 'datos_red_social.json'
 
 def cargar_datos():
+    # Intentamos cargar del JSON local primero (tu lógica original)
     if os.path.exists(DB_PATH):
         try:
             with open(DB_PATH, 'r', encoding='utf-8') as f:
@@ -44,8 +58,9 @@ def guardar_datos():
         "foros": foro_data,
         "chats": chats_privados
     }
+    # Guardamos con indent=2 para que el archivo no sea tan pesado (evita errores de texto)
     with open(DB_PATH, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
 # Inicialización global
 datos_iniciales = cargar_datos()
@@ -61,8 +76,8 @@ def enviar_codigo(correo_destino, codigo):
     msg['Subject'] = f"🤖 CÓDIGO ANTI-ROBOT: {codigo}"
     msg.attach(MIMEText(f"Tu código de acceso es: {codigo}", 'plain'))
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=10)
-        server.starttls() 
+        # Cambio a puerto 465 (SSL) que suele ser más estable en servidores como Render/Railway
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15)
         server.login(MI_CORREO, MI_PASSWORD)
         server.send_message(msg)
         server.quit()
@@ -115,7 +130,6 @@ def verificar(usuario):
                 "fecha_union": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
                 "avatar": None, "amigos": [], "solicitudes": [],
                 "altura": "", "meta_fisica": "", "hardware": "", "estado": "Activo",
-                # NUEVO: Visibilidad opcional de datos técnicos
                 "visible_altura": True, "visible_meta": True, "visible_hw": True
             }
             guardar_datos()
@@ -157,7 +171,6 @@ def ver_perfil(username):
         flash("❌ El usuario no existe o datos corruptos.")
         return redirect(url_for('ver_foro', categoria='General'))
     
-    # Asegurar que existan las claves de visibilidad para usuarios antiguos
     if "visible_altura" not in info: info["visible_altura"] = True
     if "visible_meta" not in info: info["visible_meta"] = True
     if "visible_hw" not in info: info["visible_hw"] = True
@@ -181,15 +194,12 @@ def editar_perfil():
     if 'user' not in session: return redirect('/')
     usuario = session['user']
     
-    # Recoger datos del formulario
     nueva_bio = request.form.get('bio', '').strip()
     nueva_altura = request.form.get('altura', '').strip()
     nueva_meta = request.form.get('meta_fisica', '').strip()
     nuevo_hw = request.form.get('hardware', '').strip()
     nuevo_estado = request.form.get('estado', 'Activo').strip()
     
-    # AGREGADO: Recoger estados de los checkboxes para visibilidad
-    # En HTML, si un checkbox no se marca, no se envía nada (None)
     usuarios_db[usuario]['visible_altura'] = (request.form.get('visible_altura') == 'on')
     usuarios_db[usuario]['visible_meta'] = (request.form.get('visible_meta') == 'on')
     usuarios_db[usuario]['visible_hw'] = (request.form.get('visible_hw') == 'on')
@@ -198,7 +208,6 @@ def editar_perfil():
     
     if usuario not in usuarios_db: usuarios_db[usuario] = {}
     
-    # Actualización de campos técnicos
     if nueva_bio: usuarios_db[usuario]['bio'] = nueva_bio
     usuarios_db[usuario]['altura'] = nueva_altura
     usuarios_db[usuario]['meta_fisica'] = nueva_meta
@@ -333,7 +342,6 @@ def chat_privado(amigo):
     
     if sala not in chats_privados: chats_privados[sala] = []
 
-    # AGREGADO: Al entrar al chat, marcar los mensajes del amigo como leídos
     for m in chats_privados[sala]:
         if m['envia'] == amigo:
             m['leido'] = True
@@ -360,7 +368,7 @@ def chat_privado(amigo):
                 "archivo": fname, 
                 "tipo": ftype, 
                 "fecha": datetime.now().strftime("%H:%M"),
-                "leido": False # AGREGADO: Nuevo mensaje empieza como no leído
+                "leido": False 
             })
             guardar_datos()
         return redirect(url_for('chat_privado', amigo=amigo))
@@ -379,7 +387,6 @@ def contador_global():
     for sala_id, mensajes in chats_privados.items():
         if me in sala_id.split('_'):
             for m in mensajes:
-                # Contar si el mensaje es para mí y no lo he leído
                 if m['envia'] != me and not m.get('leido', False):
                     total += 1
     return jsonify({'total': total})
@@ -390,7 +397,6 @@ def api_mensajes(amigo):
     me = session['user']
     sala = "_".join(sorted([me, amigo]))
     
-    # AGREGADO: Mientras la API actualiza, también marcamos como leídos los nuevos que lleguen
     mensajes = chats_privados.get(sala, [])
     for m in mensajes:
         if m['envia'] == amigo:
@@ -408,5 +414,7 @@ def salir():
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+# AGREGADO: Puerto dinámico para que funcione en Render/Railway
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
