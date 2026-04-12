@@ -13,7 +13,7 @@ mimetypes.add_type('video/quicktime', '.mov')
 app = Flask(__name__)
 app.secret_key = 'victor_sullana_omega_2026'
 
-# --- CONFIGURACIÓN DE GMAIL (OPTIMIZADO PARA RENDER) ---
+# --- CONFIGURACIÓN DE GMAIL ---
 MI_CORREO = "vakecama32@gmail.com" 
 MI_PASSWORD = "kehn ludf ogeo mxmh" 
 
@@ -61,7 +61,7 @@ def enviar_codigo(correo_destino, codigo):
     msg['Subject'] = f"🤖 CÓDIGO ANTI-ROBOT: {codigo}"
     msg.attach(MIMEText(f"Tu código de acceso es: {codigo}", 'plain'))
     try:
-        # Cambio a puerto 587 y contexto SSL explícito para Render
+        # Ajuste para Render: Puerto 587 con contexto SSL/TLS explícito
         contexto = ssl.create_default_context()
         server = smtplib.SMTP('smtp.gmail.com', 587, timeout=15)
         server.starttls(context=contexto) 
@@ -99,6 +99,7 @@ def registro():
         if enviar_codigo(e, cod):
             print(f"✅ Correo enviado a {e}")
         else:
+            # Rescate: Si falla el correo, mostramos el código en un flash (Modo Rescate)
             print(f"⚠️ MODO PRUEBA ACTIVADO - El código para {u} es: {cod}")
             flash(f"🛠️ MODO PRUEBA: Gmail no configurado. Tu código es: {cod}")
         
@@ -247,18 +248,14 @@ def publicar(categoria):
     if 'user' not in session: return redirect('/')
     texto = (request.form.get('mensaje') or "").strip()
     archivo = request.files.get('archivo')
-    fname = None
-    ftype = None
+    fname, ftype = None, None
     if archivo and archivo.filename != '':
         fname = secure_filename(archivo.filename)
         ext = os.path.splitext(fname)[1].lower()
         if ext in ['.png', '.jpg', '.jpeg', '.gif', '.webp']: ftype = 'img'
         elif ext in ['.mp4', '.mov', '.avi', '.webm']: ftype = 'vid' 
         archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], fname))
-    post = {
-        "id": int(time.time()), "autor": session['user'], "contenido": texto,
-        "archivo": fname, "tipo": ftype, "comentarios": [], "fecha": datetime.now().strftime("%H:%M")
-    }
+    post = {"id": int(time.time()), "autor": session['user'], "contenido": texto, "archivo": fname, "tipo": ftype, "comentarios": [], "fecha": datetime.now().strftime("%H:%M")}
     if categoria not in foro_data: foro_data[categoria] = []
     foro_data[categoria].insert(0, post)
     guardar_datos() 
@@ -272,9 +269,7 @@ def comentar(categoria, post_id):
         for p in foro_data.get(categoria, []):
             if p['id'] == post_id:
                 if "comentarios" not in p: p["comentarios"] = []
-                p['comentarios'].append({
-                    "autor": session['user'], "texto": comentario_txt, "fecha": datetime.now().strftime("%H:%M")
-                })
+                p['comentarios'].append({"autor": session['user'], "texto": comentario_txt, "fecha": datetime.now().strftime("%H:%M")})
         guardar_datos()
     return redirect(url_for('ver_foro', categoria=categoria))
 
@@ -321,8 +316,7 @@ def chat_privado(amigo):
     if request.method == 'POST':
         msg = (request.form.get('mensaje') or "").strip()
         archivo = request.files.get('archivo')
-        fname = None
-        ftype = None
+        fname, ftype = None, None
         if archivo and archivo.filename != '':
             fname = secure_filename(archivo.filename)
             ext = os.path.splitext(fname)[1].lower()
@@ -331,10 +325,7 @@ def chat_privado(amigo):
             else: ftype = 'file'
             archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], fname))
         if msg or fname:
-            chats_privados[sala].append({
-                "envia": me, "texto": msg, "archivo": fname, "tipo": ftype, 
-                "fecha": datetime.now().strftime("%H:%M"), "leido": False
-            })
+            chats_privados[sala].append({"envia": me, "texto": msg, "archivo": fname, "tipo": ftype, "fecha": datetime.now().strftime("%H:%M"), "leido": False})
             guardar_datos()
         return redirect(url_for('chat_privado', amigo=amigo))
     return render_template('chat.html', amigo=amigo, mensajes=chats_privados[sala], mi_usuario=me, usuarios_db=usuarios_db, categorias=list(foro_data.keys()))
@@ -345,12 +336,7 @@ def chat_privado(amigo):
 def contador_global():
     if 'user' not in session: return jsonify({'total': 0})
     me = session['user']
-    total = 0
-    for sala_id, mensajes in chats_privados.items():
-        if me in sala_id.split('_'):
-            for m in mensajes:
-                if m['envia'] != me and not m.get('leido', False):
-                    total += 1
+    total = sum(1 for s in chats_privados.values() for m in s if m['envia'] != me and not m.get('leido', False))
     return jsonify({'total': total})
 
 @app.route('/api/mensajes/<amigo>')
@@ -374,6 +360,6 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
-    # CAMBIO CRUCIAL PARA RENDER: Usar el puerto que asigna la plataforma
-    puerto = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=puerto)
+    # CRUCIAL PARA RENDER: Usar el puerto que la plataforma asigne dinámicamente
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
