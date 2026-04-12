@@ -15,7 +15,7 @@ app.secret_key = 'victor_sullana_omega_2026'
 
 # --- CONFIGURACIÓN DE GMAIL ---
 MI_CORREO = "vakecama32@gmail.com" 
-MI_PASSWORD = "kehn ludf ogeo mxmh" 
+MI_PASSWORD = "huav xkhs pziq kcls" 
 
 UPLOADS = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOADS
