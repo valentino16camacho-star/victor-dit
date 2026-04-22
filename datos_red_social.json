@@ -9,7 +9,9 @@
             "amigos": [
                 "victor"
             ],
-            "solicitudes": [],
+            "solicitudes": [
+                "Pro52Master"
+            ],
             "visible_altura": false,
             "visible_meta": false,
             "visible_hw": false,
@@ -26,7 +28,9 @@
             "avatar": null,
             "amigos": [
                 "val",
-                "vicoco"
+                "vicoco",
+                "Pro52Master",
+                "PENE"
             ],
             "solicitudes": [],
             "visible_altura": true,
@@ -47,7 +51,9 @@
                 "victor",
                 "victoref"
             ],
-            "solicitudes": [],
+            "solicitudes": [
+                "Pro52Master"
+            ],
             "altura": "",
             "meta_fisica": "",
             "hardware": "",
@@ -65,36 +71,310 @@
             "amigos": [
                 "vicoco"
             ],
-            "solicitudes": []
+            "solicitudes": [
+                "Pro52Master"
+            ],
+            "visible_altura": true,
+            "visible_meta": true,
+            "visible_hw": true
+        },
+        "elmeromatatanque": {
+            "p": "90909090a",
+            "e": "vakecama032@gmail.com",
+            "bio": "¡Hola! Soy nuevo en Víctor-dit.",
+            "fecha_union": "11/04/2026 21:41:02",
+            "avatar": "avatar_elmeromatatanque_1775943826.jpeg",
+            "amigos": [],
+            "solicitudes": [],
+            "altura": "",
+            "meta_fisica": "",
+            "hardware": "",
+            "estado": "Activo",
+            "visible_altura": true,
+            "visible_meta": true,
+            "visible_hw": true
+        },
+        "PENE": {
+            "p": "90909090a",
+            "e": "vakecama032@gmail.com",
+            "bio": "¡Hola! Soy el ceo de victor-dit",
+            "fecha_union": "22/04/2026 05:30:21",
+            "avatar": null,
+            "amigos": [
+                "Vicoco",
+                "Pro52Master",
+                "victor"
+            ],
+            "solicitudes": [],
+            "altura": "",
+            "meta_fisica": "",
+            "hardware": "",
+            "estado": "Activo",
+            "visible_altura": false,
+            "visible_meta": false,
+            "visible_hw": false
+        },
+        "Pro52Master": {
+            "p": "prudencio123",
+            "e": "prudenciomm@hotmail.com",
+            "bio": "Buenas a todos guapisimos",
+            "fecha_union": "22/04/2026 05:46:17",
+            "avatar": "avatar_Pro52Master_1776839682.jpg",
+            "amigos": [
+                "Vicoco",
+                "Vicoco",
+                "PENE",
+                "victor"
+            ],
+            "solicitudes": [],
+            "altura": "176",
+            "meta_fisica": "190 (dejenme soñar)",
+            "hardware": "I5 6th gen GT 710 (soy pobre)",
+            "estado": "Activo",
+            "visible_altura": true,
+            "visible_meta": true,
+            "visible_hw": true
+        },
+        "Vicoco": {
+            "p": "90909090a",
+            "e": "naomycamachoalva@gmail.com",
+            "bio": "Me proyecté",
+            "fecha_union": "22/04/2026 05:54:42",
+            "avatar": "avatar_Vicoco_1776837642.jpg",
+            "amigos": [
+                "Pro52Master",
+                "PENE",
+                "Pro52Master"
+            ],
+            "solicitudes": [],
+            "altura": "",
+            "meta_fisica": "",
+            "hardware": "",
+            "estado": "Activo",
+            "visible_altura": false,
+            "visible_meta": false,
+            "visible_hw": false
         }
     },
     "foros": {
         "General": [
             {
-                "id": 1775888543,
-                "autor": "vicoco",
-                "contenido": "AMO KARLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                "archivo": null,
-                "tipo": null,
-                "comentarios": [],
-                "fecha": "01:22"
-            },
-            {
-                "id": 1775888113,
-                "autor": "val",
-                "contenido": "dx",
-                "archivo": "becmtyvjmc8pckhb4em7.mov",
+                "id": 1776841456,
+                "autor": "Vicoco",
+                "contenido": "MCLOVIN¿?",
+                "archivo": "1000097363.mp4",
                 "tipo": "vid",
                 "comentarios": [
                     {
-                        "autor": "val",
-                        "texto": "ddsss",
-                        "fecha": "01:15"
+                        "autor": "Pro52Master",
+                        "texto": "xdd",
+                        "fecha": "07:05"
                     }
                 ],
-                "fecha": "01:15"
+                "fecha": "07:04"
+            },
+            {
+                "id": 1776841191,
+                "autor": "Pro52Master",
+                "contenido": "xd",
+                "archivo": "Minecraft__1.21.6_-_Multijugador_servidor_de_terceros_2025-11-22_14-39-47.mp4",
+                "tipo": "vid",
+                "comentarios": [
+                    {
+                        "autor": "Vicoco",
+                        "texto": "5 maneras de deshacerte de un \"BRUTO\" número UNO",
+                        "fecha": "07:01"
+                    },
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "xd",
+                        "fecha": "07:05"
+                    }
+                ],
+                "fecha": "06:59"
+            },
+            {
+                "id": 1776839823,
+                "autor": "Pro52Master",
+                "contenido": "xd",
+                "archivo": "Roblox_2026-04-01_00-27-04.mp4",
+                "tipo": "vid",
+                "comentarios": [
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "no se escucho ni mrd xd",
+                        "fecha": "06:38"
+                    },
+                    {
+                        "autor": "PENE",
+                        "texto": "jajaja si se escucha xd",
+                        "fecha": "06:38"
+                    },
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "sus voces mn",
+                        "fecha": "06:39"
+                    },
+                    {
+                        "autor": "PENE",
+                        "texto": "es porque fue en ig en discord si se hubiera escuchado",
+                        "fecha": "06:40"
+                    }
+                ],
+                "fecha": "06:37"
+            },
+            {
+                "id": 1776839378,
+                "autor": "PENE",
+                "contenido": "orgullo boliviano",
+                "archivo": "bulge_p_hitlerhoover_canonical-resize-1200x0-50.jpg",
+                "tipo": "img",
+                "comentarios": [
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "wtffff",
+                        "fecha": "06:33"
+                    },
+                    {
+                        "autor": "PENE",
+                        "texto": "bbro literalmente conquisto la mitad de eur",
+                        "fecha": "06:35"
+                    }
+                ],
+                "fecha": "06:29"
+            },
+            {
+                "id": 1776838666,
+                "autor": "PENE",
+                "contenido": "VIVAAAAAAAAAAAAAAAA PIEJJJJJJJJJJJJ",
+                "archivo": null,
+                "tipo": null,
+                "comentarios": [
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "xd",
+                        "fecha": "06:21"
+                    }
+                ],
+                "fecha": "06:17"
+            },
+            {
+                "id": 1776838243,
+                "autor": "PENE",
+                "contenido": "Ñ",
+                "archivo": "Download_-_2026-04-10T204614.065.mp4",
+                "tipo": "vid",
+                "comentarios": [
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "no escucho un carajooooo",
+                        "fecha": "06:11"
+                    },
+                    {
+                        "autor": "Vicoco",
+                        "texto": "Mano tengo audífonos sin micrófono",
+                        "fecha": "06:12"
+                    },
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "ok bro",
+                        "fecha": "06:13"
+                    },
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "pasalos pls",
+                        "fecha": "06:13"
+                    },
+                    {
+                        "autor": "PENE",
+                        "texto": "YAYA HAY VOY",
+                        "fecha": "06:13"
+                    }
+                ],
+                "fecha": "06:10"
+            },
+            {
+                "id": 1776838163,
+                "autor": "PENE",
+                "contenido": "QUE OPINAS BRO SIENTO QUE LE FALTAN ALGUNAS COSAS ESTA EN FASE BETA AUN",
+                "archivo": null,
+                "tipo": null,
+                "comentarios": [
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "la foto de perfila al costado de los nombres de usuario",
+                        "fecha": "06:10"
+                    },
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "estaria epico",
+                        "fecha": "06:10"
+                    },
+                    {
+                        "autor": "Vicoco",
+                        "texto": "Vrd buena idea",
+                        "fecha": "06:12"
+                    }
+                ],
+                "fecha": "06:09"
+            },
+            {
+                "id": 1776838013,
+                "autor": "Vicoco",
+                "contenido": "BROOO UNA CHICAA",
+                "archivo": "1000096561.mp4",
+                "tipo": "vid",
+                "comentarios": [
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "xd",
+                        "fecha": "06:08"
+                    },
+                    {
+                        "autor": "PENE",
+                        "texto": "especial",
+                        "fecha": "06:08"
+                    },
+                    {
+                        "autor": "Pro52Master",
+                        "texto": "no escucho ni mrd",
+                        "fecha": "06:08"
+                    }
+                ],
+                "fecha": "06:06"
+            },
+            {
+                "id": 1776837886,
+                "autor": "Pro52Master",
+                "contenido": "hola\r\n=)",
+                "archivo": null,
+                "tipo": null,
+                "comentarios": [
+                    {
+                        "autor": "Vicoco",
+                        "texto": "Hola bro",
+                        "fecha": "06:05"
+                    }
+                ],
+                "fecha": "06:04"
+            },
+            {
+                "id": 1776836821,
+                "autor": "Pro52Master",
+                "contenido": "creo que a parsich le gusta el pn",
+                "archivo": null,
+                "tipo": null,
+                "comentarios": [
+                    {
+                        "autor": "Vicoco",
+                        "texto": "Si bro le encanta",
+                        "fecha": "05:54"
+                    }
+                ],
+                "fecha": "05:47"
             }
-        ]
+        ],
+        "amigos": []
     },
     "chats": {
         "val_victor": [
@@ -112,6 +392,14 @@
                 "archivo": "Download_-_2026-04-10T204614.065.mp4",
                 "tipo": "vid",
                 "fecha": "01:13",
+                "leido": true
+            },
+            {
+                "envia": "val",
+                "texto": "",
+                "archivo": "becmtyvjmc8pckhb4em7_2.mov",
+                "tipo": "vid",
+                "fecha": "21:34",
                 "leido": true
             }
         ],
@@ -181,7 +469,293 @@
                 "tipo": null,
                 "fecha": "02:08",
                 "leido": true
+            },
+            {
+                "envia": "vicoco",
+                "texto": "hola",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "05:32",
+                "leido": false
+            },
+            {
+                "envia": "vicoco",
+                "texto": "hola",
+                "archivo": "WhatsApp_Image_2026-04-19_at_2.21.49_PM.jpeg",
+                "tipo": "img",
+                "fecha": "05:32",
+                "leido": false
+            },
+            {
+                "envia": "vicoco",
+                "texto": "hola",
+                "archivo": "Download_-_2026-04-19T143440.225.mp4",
+                "tipo": "vid",
+                "fecha": "05:33",
+                "leido": false
             }
-        ]
+        ],
+        "Pro52Master_Vicoco": [
+            {
+                "envia": "Vicoco",
+                "texto": "Hola bro",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "06:23",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Bello",
+                "archivo": "Screenshot_20260422_010015.jpg",
+                "tipo": "img",
+                "fecha": "06:24",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "epico",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "06:25",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Aura bro",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "06:27",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Falta ponerle llamadas y ya",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "06:27",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Qda",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "06:27",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "y queda",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "06:28",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Jajaj si",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "06:33",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Buen tema bro",
+                "archivo": "e870bc14ae8ddbf03388bf7c00f22e4b.mp4",
+                "tipo": "vid",
+                "fecha": "07:11",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "epico",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:12",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "tienes steam bro?",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:12",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Nimodo brl",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:14",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "JAJJAJ",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:14",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "pasa user",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:14",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "De steam pucha tengo q recuperar ya me olvidé Jajajaj",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:16",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "pera",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:16",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "https://www.youtube.com/watch?v=HYgdrDnxm3c",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:16",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Yo el menos racista",
+                "archivo": "847431595a2467be1aace7b6bc1eb945.mp4",
+                "tipo": "vid",
+                "fecha": "07:16",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "xdd",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:17",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Xd",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:17",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "veelo vroo",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:18",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "https://www.youtube.com/watch?v=HYgdrDnxm3c",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:18",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Maldito parsrc",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:19",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Ya lo había usado para humillar a mi amigo q pensábamos q era bueno pero usaba hacks el cabron",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:19",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "xd",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:20",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "dale bro pa jugar cuphead",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:20",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "El de los cabezas de taza voy a ver el vídeo",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:21",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "ok",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:23",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "https://parsec.gg/g/3ChfpgeQNIUBbaUWTv8RBO9HYKK/c423fe67/",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:28",
+                "leido": true
+            },
+            {
+                "envia": "Pro52Master",
+                "texto": "ya broo",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "07:30",
+                "leido": true
+            },
+            {
+                "envia": "Vicoco",
+                "texto": "Yayaya bebesote como el snayder",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "20:11",
+                "leido": false
+            }
+        ],
+        "PENE_Vicoco": [],
+        "PENE_Pro52Master": [
+            {
+                "envia": "PENE",
+                "texto": "HOLA",
+                "archivo": null,
+                "tipo": null,
+                "fecha": "22:30",
+                "leido": false
+            }
+        ],
+        "PENE_victor": []
     }
 }
