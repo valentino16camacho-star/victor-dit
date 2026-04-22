@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from flask_socketio import SocketIO, emit # AGREGADO PARA TIEMPO REAL
 
 # AGREGADO: Forzar que el navegador reconozca videos correctamente
 mimetypes.add_type('video/mp4', '.mp4')
@@ -12,6 +13,7 @@ mimetypes.add_type('video/quicktime', '.mov')
 
 app = Flask(__name__)
 app.secret_key = 'victor_sullana_omega_2026'
+socketio = SocketIO(app, cors_allowed_origins="*") # AGREGADO PARA TIEMPO REAL
 
 # --- CONFIGURACIÓN DE GMAIL ---
 MI_CORREO = "vakecama32@gmail.com" 
@@ -115,7 +117,6 @@ def verificar(usuario):
                 "fecha_union": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
                 "avatar": None, "amigos": [], "solicitudes": [],
                 "altura": "", "meta_fisica": "", "hardware": "", "estado": "Activo",
-                # NUEVO: Visibilidad opcional de datos técnicos
                 "visible_altura": True, "visible_meta": True, "visible_hw": True
             }
             guardar_datos()
@@ -157,7 +158,6 @@ def ver_perfil(username):
         flash("❌ El usuario no existe o datos corruptos.")
         return redirect(url_for('ver_foro', categoria='General'))
     
-    # Asegurar que existan las claves de visibilidad para usuarios antiguos
     if "visible_altura" not in info: info["visible_altura"] = True
     if "visible_meta" not in info: info["visible_meta"] = True
     if "visible_hw" not in info: info["visible_hw"] = True
@@ -181,15 +181,12 @@ def editar_perfil():
     if 'user' not in session: return redirect('/')
     usuario = session['user']
     
-    # Recoger datos del formulario
     nueva_bio = request.form.get('bio', '').strip()
     nueva_altura = request.form.get('altura', '').strip()
     nueva_meta = request.form.get('meta_fisica', '').strip()
     nuevo_hw = request.form.get('hardware', '').strip()
     nuevo_estado = request.form.get('estado', 'Activo').strip()
     
-    # AGREGADO: Recoger estados de los checkboxes para visibilidad
-    # En HTML, si un checkbox no se marca, no se envía nada (None)
     usuarios_db[usuario]['visible_altura'] = (request.form.get('visible_altura') == 'on')
     usuarios_db[usuario]['visible_meta'] = (request.form.get('visible_meta') == 'on')
     usuarios_db[usuario]['visible_hw'] = (request.form.get('visible_hw') == 'on')
@@ -198,7 +195,6 @@ def editar_perfil():
     
     if usuario not in usuarios_db: usuarios_db[usuario] = {}
     
-    # Actualización de campos técnicos
     if nueva_bio: usuarios_db[usuario]['bio'] = nueva_bio
     usuarios_db[usuario]['altura'] = nueva_altura
     usuarios_db[usuario]['meta_fisica'] = nueva_meta
@@ -277,6 +273,10 @@ def publicar(categoria):
     }
     if categoria not in foro_data: foro_data[categoria] = []
     foro_data[categoria].insert(0, post)
+    
+    # EMISIÓN EN TIEMPO REAL: Publicación nueva
+    socketio.emit('nueva_publicacion', {'categoria': categoria, 'post': post}, broadcast=True)
+    
     guardar_datos() 
     return redirect(url_for('ver_foro', categoria=categoria))
 
@@ -288,9 +288,17 @@ def comentar(categoria, post_id):
         for p in foro_data.get(categoria, []):
             if p['id'] == post_id:
                 if "comentarios" not in p: p["comentarios"] = []
-                p['comentarios'].append({
+                nuevo_com = {
                     "autor": session['user'], "texto": comentario_txt, "fecha": datetime.now().strftime("%H:%M")
-                })
+                }
+                p['comentarios'].append(nuevo_com)
+                
+                # EMISIÓN EN TIEMPO REAL: Comentario nuevo
+                socketio.emit('nuevo_comentario', {
+                    'post_id': post_id, 
+                    'categoria': categoria, 
+                    'comentario': nuevo_com
+                }, broadcast=True)
         guardar_datos()
     return redirect(url_for('ver_foro', categoria=categoria))
 
@@ -333,7 +341,6 @@ def chat_privado(amigo):
     
     if sala not in chats_privados: chats_privados[sala] = []
 
-    # AGREGADO: Al entrar al chat, marcar los mensajes del amigo como leídos
     for m in chats_privados[sala]:
         if m['envia'] == amigo:
             m['leido'] = True
@@ -354,14 +361,19 @@ def chat_privado(amigo):
             archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], fname))
 
         if msg or fname:
-            chats_privados[sala].append({
+            nuevo_msg = {
                 "envia": me, 
                 "texto": msg, 
                 "archivo": fname, 
                 "tipo": ftype, 
                 "fecha": datetime.now().strftime("%H:%M"),
-                "leido": False # AGREGADO: Nuevo mensaje empieza como no leído
-            })
+                "leido": False 
+            }
+            chats_privados[sala].append(nuevo_msg)
+            
+            # EMISIÓN EN TIEMPO REAL: Mensaje de chat
+            socketio.emit('mensaje_chat', {'sala': sala, 'msg': nuevo_msg}, room=sala)
+            
             guardar_datos()
         return redirect(url_for('chat_privado', amigo=amigo))
 
@@ -379,7 +391,6 @@ def contador_global():
     for sala_id, mensajes in chats_privados.items():
         if me in sala_id.split('_'):
             for m in mensajes:
-                # Contar si el mensaje es para mí y no lo he leído
                 if m['envia'] != me and not m.get('leido', False):
                     total += 1
     return jsonify({'total': total})
@@ -390,7 +401,6 @@ def api_mensajes(amigo):
     me = session['user']
     sala = "_".join(sorted([me, amigo]))
     
-    # AGREGADO: Mientras la API actualiza, también marcamos como leídos los nuevos que lleguen
     mensajes = chats_privados.get(sala, [])
     for m in mensajes:
         if m['envia'] == amigo:
@@ -409,7 +419,6 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # --- SISTEMA DE LLAMADAS (WEBRTC SIGNALING) ---
-# Usamos un diccionario en memoria (no en el JSON) para que sea súper rápido
 señales_webrtc = {}
 
 @app.route('/api/webrtc/<sala>', methods=['GET', 'POST'])
@@ -420,16 +429,22 @@ def webrtc_signaling(sala):
         señales_webrtc[sala] = []
 
     if request.method == 'POST':
-        # Guardar la señal que envía un usuario
         data = request.json
         data['remitente'] = session['user']
         señales_webrtc[sala].append(data)
         return jsonify({"status": "ok"})
     else:
-        # Leer señales que no sean mías y borrarlas para no saturar
         mensajes_para_mi = [m for m in señales_webrtc[sala] if m['remitente'] != session['user']]
         señales_webrtc[sala] = [m for m in señales_webrtc[sala] if m['remitente'] == session['user']]
         return jsonify(mensajes_para_mi)
 
+# EVENTOS DE SOCKET.IO
+@socketio.on('join')
+def on_join(data):
+    from flask_socketio import join_room
+    room = data['sala']
+    join_room(room)
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # CAMBIADO A socketio.run
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
