@@ -13,6 +13,7 @@
             --burbuja-enviado: #00ff88;
             --burbuja-recibido: #21262d;
             --rojo-notif: #ff4444;
+            --danger: #ff4d4d; /* Color para colgar */
         }
 
         body {
@@ -156,7 +157,6 @@
 
         .clip-btn:hover { transform: scale(1.2); }
 
-        /* Badge para el botón volver si hay otros mensajes */
         .notif-badge {
             display: none;
             background: var(--rojo-notif);
@@ -167,17 +167,33 @@
             margin-left: 5px;
             box-shadow: 0 0 8px var(--rojo-notif);
         }
+
+        /* ESTILOS DE LLAMADA INTEGRADOS */
+        .call-controls { display: flex; gap: 10px; align-items: center; }
+        .btn-call { background: var(--verde-neon); color: #000; border: none; padding: 6px 12px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .btn-hangup { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 12px; display: none; }
+        #estado-llamada { font-size: 10px; color: var(--verde-neon); margin-right: 8px; font-style: italic; }
     </style>
 </head>
 <body>
+
+    <audio id="audioLocal" autoplay muted style="display:none;"></audio>
+    <audio id="audioRemoto" autoplay style="display:none;"></audio>
 
     <div class="main-chat">
         <div class="chat-header">
             <a href="/mis_chats" style="color: var(--verde-neon); text-decoration: none; font-weight: bold; display: flex; align-items: center;">
                 ⬅ Volver <span id="notif-badge" class="notif-badge">0</span>
             </a>
+            
             <h3 style="margin: 0;">{{ amigo }}</h3>
-            <div style="width: 10px; height: 10px; background: var(--verde-neon); border-radius: 50%; box-shadow: 0 0 10px var(--verde-neon);"></div>
+
+            <div class="call-controls">
+                <span id="estado-llamada"></span>
+                <button id="btnLlamar" class="btn-call">📞 LLAMAR</button>
+                <button id="btnColgar" class="btn-hangup">🚫 COLGAR</button>
+                <div style="width: 10px; height: 10px; background: var(--verde-neon); border-radius: 50%; box-shadow: 0 0 10px var(--verde-neon); margin-left: 10px;"></div>
+            </div>
         </div>
 
         <div class="chat-messages" id="box">
@@ -234,7 +250,7 @@
         scrollToBottom();
 
         function actualizarMensajes() {
-            // REVISAR SI HAY VIDEO EN PLAY PARA NO INTERRUMPIR
+            // REVISAR SI HAY VIDEO EN PLAY PARA NO INTERRUMPIR (Mantenido tal cual)
             const videos = document.querySelectorAll('.chat-video');
             let videoEnReproduccion = false;
             videos.forEach(v => {
@@ -261,7 +277,6 @@
             .catch(err => console.error('Error al actualizar mensajes:', err));
         }
 
-        // NUEVO: Función para ver si hay mensajes de OTROS amigos mientras estoy en este chat
         function actualizarNotificacionesGlobales() {
             fetch('/api/contador_global')
             .then(res => res.json())
@@ -277,11 +292,91 @@
             .catch(err => console.log("Error en notificaciones"));
         }
 
-        // Intervalos
+        // --- SISTEMA DE LLAMADAS WEBRTC ---
+        const miUsuario = "{{ mi_usuario }}";
+        const amigoUsuario = "{{ amigo }}";
+        const salaLlamada = [miUsuario, amigoUsuario].sort().join('_');
+
+        const btnLlamar = document.getElementById('btnLlamar');
+        const btnColgar = document.getElementById('btnColgar');
+        const estadoTxt = document.getElementById('estado-llamada');
+
+        let peerConnection;
+        let localStream;
+        const configWebRTC = { 'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}] };
+
+        async function prepararMicrofono() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                document.getElementById('audioLocal').srcObject = localStream;
+                peerConnection = new RTCPeerConnection(configWebRTC);
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+                peerConnection.ontrack = (e) => {
+                    document.getElementById('audioRemoto').srcObject = e.streams[0];
+                    estadoTxt.innerText = "• En llamada";
+                };
+
+                peerConnection.onicecandidate = (e) => {
+                    if (e.candidate) enviarSenal({ tipo: 'candidate', candidate: e.candidate });
+                };
+                return true;
+            } catch (err) {
+                alert("Debes permitir el acceso al micrófono.");
+                return false;
+            }
+        }
+
+        function enviarSenal(data) {
+            fetch(`/api/webrtc/${salaLlamada}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+        }
+
+        btnLlamar.onclick = async () => {
+            if (await prepararMicrofono()) {
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                enviarSenal({ tipo: 'offer', sdp: peerConnection.localDescription });
+                btnLlamar.style.display = 'none';
+                btnColgar.style.display = 'block';
+                estadoTxt.innerText = "Llamando...";
+            }
+        };
+
+        btnColgar.onclick = () => location.reload();
+
+        // Escuchador de señales WebRTC (Integrado con tus intervalos)
+        async function escucharLlamadas() {
+            const resp = await fetch(`/api/webrtc/${salaLlamada}`);
+            const senales = await resp.json();
+            for (const s of senales) {
+                if (s.tipo === 'offer' && !peerConnection) {
+                    if (confirm(`${amigoUsuario} te llama. ¿Contestar?`)) {
+                        await prepararMicrofono();
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(s.sdp));
+                        const answer = await peerConnection.createAnswer();
+                        await peerConnection.setLocalDescription(answer);
+                        enviarSenal({ tipo: 'answer', sdp: peerConnection.localDescription });
+                        btnLlamar.style.display = 'none';
+                        btnColgar.style.display = 'block';
+                    }
+                } else if (s.tipo === 'answer' && peerConnection) {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(s.sdp));
+                } else if (s.tipo === 'candidate' && peerConnection) {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(s.candidate));
+                }
+            }
+        }
+
+        // Intervalos (Respetando los tuyos y sumando el de llamadas)
         setInterval(actualizarMensajes, 2000);
         setInterval(actualizarNotificacionesGlobales, 4000);
+        setInterval(escucharLlamadas, 2000); 
         
-        // Carga inicial de notificaciones
+        // Carga inicial
         actualizarNotificacionesGlobales();
     </script>
 </body>
