@@ -1,5 +1,6 @@
+setuptools
 flask
+flask-socketio
+eventlet==0.33.3
 gunicorn
 werkzeug
-flask-socketio
-eventlet
