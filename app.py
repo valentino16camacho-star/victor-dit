@@ -1,5 +1,5 @@
 import eventlet
-eventlet.monkey_patch()  # <--- AGREGADO: Esto evita que el servidor se trabe en Render
+eventlet.monkey_patch()
 
 import os, time, random, smtplib, json, mimetypes
 from flask import Flask, render_template, request, redirect, session, url_for, flash, send_from_directory, jsonify
@@ -9,14 +9,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask_socketio import SocketIO, emit
 
-# Forzar que el navegador reconozca videos correctamente
 mimetypes.add_type('video/mp4', '.mp4')
 mimetypes.add_type('video/webm', '.webm')
 mimetypes.add_type('video/quicktime', '.mov')
 
 app = Flask(__name__)
 app.secret_key = 'victor_sullana_omega_2026'
-# Configuración con async_mode para mayor estabilidad
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # --- CONFIGURACIÓN DE GMAIL ---
@@ -28,7 +26,6 @@ app.config['UPLOAD_FOLDER'] = UPLOADS
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024 
 if not os.path.exists(UPLOADS): os.makedirs(UPLOADS)
 
-# --- SISTEMA DE PERSISTENCIA ---
 DB_PATH = 'datos_red_social.json'
 
 def cargar_datos():
@@ -59,7 +56,22 @@ foro_data = datos_iniciales["foros"]
 chats_privados = datos_iniciales["chats"]
 pendientes = {}
 
-# --- RUTAS ---
+def enviar_codigo(correo_destino, codigo):
+    msg = MIMEMultipart()
+    msg['From'] = MI_CORREO
+    msg['To'] = correo_destino
+    msg['Subject'] = f"🤖 CÓDIGO ANTI-ROBOT: {codigo}"
+    msg.attach(MIMEText(f"Tu código de acceso es: {codigo}", 'plain'))
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=10)
+        server.starttls()
+        server.login(MI_CORREO, MI_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"❌ ERROR GMAIL: {e}")
+        return False
 
 @app.route('/')
 def index():
@@ -81,7 +93,7 @@ def registro():
         
         cod = str(random.randint(100000, 999999))
         pendientes[u] = {"p": p, "e": e, "cod": cod}
-        # Aquí iría enviar_codigo(e, cod)
+        enviar_codigo(e, cod)
         return redirect(url_for('verificar', usuario=u))
     return render_template('registro.html')
 
@@ -107,7 +119,7 @@ def verificar(usuario):
 def login():
     u = request.form.get('u', '').strip()
     p = request.form.get('p', '').strip()
-    if u in usuarios_db and usuarios_db[u]['p'] == p:
+    if u in usuarios_db and usuarios_db[u].get('p') == p:
         session['user'] = u
         return redirect('/foro/General')
     flash("❌ Datos incorrectos.")
@@ -146,10 +158,7 @@ def publicar(categoria):
     
     if categoria not in foro_data: foro_data[categoria] = []
     foro_data[categoria].insert(0, post)
-    
-    # CORREGIDO: Se quitó el broadcast=True que causaba el error 500
     socketio.emit('nueva_publicacion', {'categoria': categoria, 'post': post})
-    
     guardar_datos()
     return redirect(url_for('ver_foro', categoria=categoria))
 
@@ -160,19 +169,9 @@ def comentar(categoria, post_id):
     if texto:
         for p in foro_data.get(categoria, []):
             if p['id'] == post_id:
-                nuevo_com = {
-                    "autor": session['user'],
-                    "texto": texto,
-                    "fecha": datetime.now().strftime("%H:%M")
-                }
+                nuevo_com = {"autor": session['user'], "texto": texto, "fecha": datetime.now().strftime("%H:%M")}
                 p['comentarios'].append(nuevo_com)
-                
-                # CORREGIDO: Se quitó el broadcast=True para evitar errores
-                socketio.emit('nuevo_comentario', {
-                    'post_id': post_id,
-                    'categoria': categoria,
-                    'comentario': nuevo_com
-                })
+                socketio.emit('nuevo_comentario', {'post_id': post_id, 'categoria': categoria, 'comentario': nuevo_com})
         guardar_datos()
     return redirect(url_for('ver_foro', categoria=categoria))
 
